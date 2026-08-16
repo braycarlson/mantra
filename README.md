@@ -1,9 +1,5 @@
 <p align="center">
-    <picture>
-        <source media="(prefers-color-scheme: dark)" srcset="assets/mantra-lockup-on-dark.svg">
-        <source media="(prefers-color-scheme: light)" srcset="assets/mantra-lockup-on-light.svg">
-        <img alt="mantra" src="assets/mantra-lockup-on-light.svg" width="500">
-    </picture>
+    <img alt="mantra" src="assets/mantra-lockup.svg" width="500">
 </p>
 
 &nbsp;
