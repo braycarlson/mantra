@@ -1,9 +1,9 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="620" height="140" viewBox="0 0 620 140" fill="none">
-  <g transform="translate(0 8) scale(1.36)">
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="240" viewBox="0 0 400 240" fill="none">
+  <g transform="translate(158 8) scale(0.94)">
   <circle cx="10" cy="45" r="7" fill="#1FC46F"></circle>
   <path d="M26 22 A 30 30 0 0 1 26 68" stroke="#1FC46F" stroke-width="2.6" fill="none" stroke-linecap="round"></path>
   <path d="M44 11 A 44 44 0 0 1 44 79" stroke="#1FC46F" stroke-width="2.6" fill="none" stroke-linecap="round" opacity="0.5"></path>
   <path d="M62 2 A 58 58 0 0 1 62 88" stroke="#1FC46F" stroke-width="2.6" fill="none" stroke-linecap="round" opacity="0.22"></path>
   </g>
-  <text x="140" y="106" font-family="Archivo, &#39;Archivo Black&#39;, Helvetica, Arial, sans-serif" font-weight="800" font-size="130" letter-spacing="-6.5" fill="#F1F5F2">mantra</text>
+  <text x="64" y="218" font-family="Archivo, &#39;Archivo Black&#39;, Helvetica, Arial, sans-serif" font-weight="800" font-size="76" letter-spacing="-3.8" fill="#F1F5F2">mantra</text>
 </svg>
