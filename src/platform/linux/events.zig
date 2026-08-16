@@ -107,7 +107,11 @@ pub fn is_subscribed() bool {
     lock.lock();
     defer lock.unlock();
 
-    return thread != null;
+    if (thread == null) {
+        return false;
+    }
+
+    return running.load(.seq_cst);
 }
 
 pub fn to_event(facility: u32, change: u32) ?DeviceEvent {
@@ -141,6 +145,8 @@ pub fn to_direction(facility: u32) ?Direction {
 }
 
 fn pump() void {
+    defer running.store(false, .seq_cst);
+
     while (running.load(.seq_cst)) {
         const event = connection.read_event() catch {
             return;
