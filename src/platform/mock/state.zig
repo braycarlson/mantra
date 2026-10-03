@@ -31,7 +31,7 @@ pub const Call = enum(u8) {
     unsubscribe = 10,
 };
 
-pub const call_count: u32 = @typeInfo(Call).@"enum".fields.len;
+pub const call_count: u32 = @typeInfo(Call).@"enum".field_names.len;
 
 comptime {
     assert(entries_max > 0);
@@ -44,7 +44,7 @@ comptime {
 pub const Entry = struct {
     id: DeviceId = .{},
     muted: bool = false,
-    name: [contract.name_bytes_max]u8 = [_]u8{0} ** contract.name_bytes_max,
+    name: [contract.name_bytes_max]u8 = @splat(0),
     name_len: u16 = 0,
     volume: f32 = volume_default,
 
@@ -63,9 +63,9 @@ pub const Entry = struct {
     }
 };
 
-var counts: [call_count]u32 = [_]u32{0} ** call_count;
-var defaults: [direction_count]?u32 = [_]?u32{null} ** direction_count;
-var entries: [entries_max]Entry = [_]Entry{.{}} ** entries_max;
+var counts: [call_count]u32 = @splat(0);
+var defaults: [direction_count]?u32 = @splat(null);
+var entries: [entries_max]Entry = @splat(.{});
 var entry_count: u32 = 0;
 var failure: ?Call = null;
 var opened: bool = false;
@@ -81,8 +81,8 @@ pub fn reset() void {
 }
 
 pub fn clear() void {
-    counts = [_]u32{0} ** call_count;
-    defaults = [_]?u32{null} ** direction_count;
+    counts = @splat(0);
+    defaults = @splat(null);
     entry_count = 0;
     failure = null;
     opened = false;
@@ -165,7 +165,7 @@ pub fn count() u32 {
 }
 
 pub fn count_of(call: Call) u32 {
-    const index = @intFromEnum(call);
+    const index = @backingInt(call);
 
     assert(index < call_count);
 
@@ -173,7 +173,7 @@ pub fn count_of(call: Call) u32 {
 }
 
 pub fn record(call: Call) void {
-    const index = @intFromEnum(call);
+    const index = @backingInt(call);
 
     assert(index < call_count);
 
@@ -249,19 +249,19 @@ pub fn set_default_index(direction: Direction, index: u32) void {
     assert(direction.is_valid());
     assert(index < entry_count);
 
-    defaults[@intFromEnum(direction)] = index;
+    defaults[@backingInt(direction)] = index;
 }
 
 pub fn clear_default(direction: Direction) void {
     assert(direction.is_valid());
 
-    defaults[@intFromEnum(direction)] = null;
+    defaults[@backingInt(direction)] = null;
 }
 
 pub fn default_index(direction: Direction) ?u32 {
     assert(direction.is_valid());
 
-    return defaults[@intFromEnum(direction)];
+    return defaults[@backingInt(direction)];
 }
 
 pub fn fill(direction: Direction, list: *DeviceList) DeviceError!void {

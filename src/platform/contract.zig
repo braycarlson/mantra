@@ -21,14 +21,14 @@ pub const Capabilities = struct {
     events: bool,
 };
 
-pub const capability_count: u8 = @typeInfo(Capabilities).@"struct".fields.len;
+pub const capability_count: u8 = @typeInfo(Capabilities).@"struct".field_names.len;
 
 pub const Direction = enum(u8) {
     capture = 0,
     render = 1,
 
     pub fn is_valid(direction: Direction) bool {
-        return @intFromEnum(direction) <= @intFromEnum(Direction.render);
+        return @backingInt(direction) <= @backingInt(Direction.render);
     }
 
     pub fn to_string(direction: Direction) []const u8 {
@@ -50,7 +50,7 @@ pub const DeviceEvent = enum(u8) {
     default_changed = 3,
 
     pub fn is_valid(event: DeviceEvent) bool {
-        return @intFromEnum(event) <= @intFromEnum(DeviceEvent.default_changed);
+        return @backingInt(event) <= @backingInt(DeviceEvent.default_changed);
     }
 
     pub fn to_string(event: DeviceEvent) []const u8 {
@@ -68,7 +68,7 @@ pub const DeviceEvent = enum(u8) {
 };
 
 pub const DeviceId = struct {
-    bytes: [id_bytes_max]u8 = [_]u8{0} ** id_bytes_max,
+    bytes: [id_bytes_max]u8 = @splat(0),
     direction: Direction = .capture,
     len: u16 = 0,
 
@@ -114,7 +114,7 @@ pub const DeviceId = struct {
 pub const DeviceInfo = struct {
     id: DeviceId = .{},
     is_default: bool = false,
-    name: [name_bytes_max]u8 = [_]u8{0} ** name_bytes_max,
+    name: [name_bytes_max]u8 = @splat(0),
     name_len: u16 = 0,
 
     pub fn init(id: DeviceId, name: []const u8, is_default: bool) DeviceInfo {
@@ -156,7 +156,7 @@ pub const DeviceInfo = struct {
 
 pub const DeviceList = struct {
     count: u32 = 0,
-    items: [devices_max]DeviceInfo = [_]DeviceInfo{.{}} ** devices_max,
+    items: [devices_max]DeviceInfo = @splat(.{}),
 
     pub fn init() DeviceList {
         const result = DeviceList{};
@@ -413,9 +413,9 @@ test "an identifier carries its direction and rejects the empty name" {
 }
 
 test "an identifier longer than the field is rejected rather than truncated" {
-    const text = "x" ** (id_bytes_max + 1);
+    const text: [id_bytes_max + 1]u8 = @splat('x');
 
-    try testing.expectError(DeviceError.Invalid, DeviceId.init(.capture, text));
+    try testing.expectError(DeviceError.Invalid, DeviceId.init(.capture, &text));
 }
 
 test "identifiers of different directions never compare equal" {
@@ -429,9 +429,9 @@ test "identifiers of different directions never compare equal" {
 
 test "a device name longer than the field is truncated rather than overflowing" {
     const id = try DeviceId.init(.capture, "id");
-    const name = "n" ** (name_bytes_max + 64);
+    const name: [name_bytes_max + 64]u8 = @splat('n');
 
-    const info = DeviceInfo.init(id, name, false);
+    const info = DeviceInfo.init(id, &name, false);
 
     try testing.expectEqual(@as(u16, name_bytes_max), info.name_len);
     try testing.expectEqual(@as(usize, name_bytes_max), info.get_name().len);
@@ -447,7 +447,7 @@ test "a list fills to its bound and then reports the overflow" {
     while (index < devices_max) : (index += 1) {
         var text: [16]u8 = undefined;
 
-        const name = try std.fmt.bufPrint(&text, "device-{d}", .{index});
+        const name = try std.mem.print(&text, "device-{d}", .{index});
         const id = try DeviceId.init(.capture, name);
 
         try list.append(DeviceInfo.init(id, name, false));

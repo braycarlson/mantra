@@ -133,7 +133,7 @@ pub const Writer = struct {
     }
 
     fn tag(writer: *Writer, value: Tag) void {
-        writer.raw_u8(@intFromEnum(value));
+        writer.raw_u8(@backingInt(value));
     }
 
     fn raw_u8(writer: *Writer, value: u8) void {
@@ -203,7 +203,7 @@ pub const Reader = struct {
             return Error.Truncated;
         }
 
-        return to_tag(reader.buffer[reader.offset]);
+        return std.enums.fromInt(Tag, reader.buffer[reader.offset]) orelse Error.Unexpected;
     }
 
     pub fn read_u8(reader: *Reader) Error!u8 {
@@ -253,7 +253,7 @@ pub const Reader = struct {
 
         const start = reader.offset;
 
-        const end = std.mem.indexOfScalarPos(u8, reader.buffer, start, 0) orelse {
+        const end = std.mem.findScalarPos(u8, reader.buffer, start, 0) orelse {
             return Error.Truncated;
         };
 
@@ -312,7 +312,7 @@ pub const Reader = struct {
     }
 
     fn skip_string(reader: *Reader) Error!void {
-        const end = std.mem.indexOfScalarPos(u8, reader.buffer, reader.offset, 0) orelse {
+        const end = std.mem.findScalarPos(u8, reader.buffer, reader.offset, 0) orelse {
             return Error.Truncated;
         };
 
@@ -395,16 +395,6 @@ pub const Reader = struct {
         return result;
     }
 };
-
-fn to_tag(value: u8) Error!Tag {
-    inline for (@typeInfo(Tag).@"enum".fields) |field| {
-        if (value == field.value) {
-            return @enumFromInt(field.value);
-        }
-    }
-
-    return Error.Unexpected;
-}
 
 const testing = std.testing;
 

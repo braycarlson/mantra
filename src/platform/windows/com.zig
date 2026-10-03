@@ -52,7 +52,7 @@ pub const GUID = extern struct {
     data1: u32 = 0,
     data2: u16 = 0,
     data3: u16 = 0,
-    data4: [8]u8 = [_]u8{0} ** 8,
+    data4: [8]u8 = @splat(0),
 
     pub fn eql(value: *const GUID, other: *const GUID) bool {
         if (value.data1 != other.data1) {

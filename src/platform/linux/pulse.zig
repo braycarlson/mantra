@@ -82,9 +82,9 @@ pub const Device = struct {
     channels: u8 = 1,
     index: u32 = 0,
     muted: bool = false,
-    name: [tag_name_bytes_max]u8 = [_]u8{0} ** tag_name_bytes_max,
+    name: [tag_name_bytes_max]u8 = @splat(0),
     name_len: u16 = 0,
-    description: [tag_name_bytes_max]u8 = [_]u8{0} ** tag_name_bytes_max,
+    description: [tag_name_bytes_max]u8 = @splat(0),
     description_len: u16 = 0,
     volume: u32 = 0,
 
@@ -102,7 +102,7 @@ pub const devices_max: u32 = 32;
 
 pub const DeviceList = struct {
     count: u32 = 0,
-    items: [devices_max]Device = [_]Device{.{}} ** devices_max,
+    items: [devices_max]Device = @splat(.{}),
 
     pub fn slice(list: *const DeviceList) []const Device {
         return list.items[0..list.count];
@@ -110,9 +110,9 @@ pub const DeviceList = struct {
 };
 
 pub const ServerInfo = struct {
-    default_sink: [tag_name_bytes_max]u8 = [_]u8{0} ** tag_name_bytes_max,
+    default_sink: [tag_name_bytes_max]u8 = @splat(0),
     default_sink_len: u16 = 0,
-    default_source: [tag_name_bytes_max]u8 = [_]u8{0} ** tag_name_bytes_max,
+    default_source: [tag_name_bytes_max]u8 = @splat(0),
     default_source_len: u16 = 0,
 
     pub fn get_default_sink(info: *const ServerInfo) []const u8 {
@@ -349,7 +349,7 @@ pub const Connection = struct {
             return Error.Protocol;
         };
 
-        if (command != @intFromEnum(Command.subscribe_event)) {
+        if (command != @backingInt(Command.subscribe_event)) {
             return null;
         }
 
@@ -386,7 +386,7 @@ pub const Connection = struct {
     }
 
     fn authenticate(connection: *Connection) Error!void {
-        var cookie: [cookie_bytes]u8 = [_]u8{0} ** cookie_bytes;
+        var cookie: [cookie_bytes]u8 = @splat(0);
 
         load_cookie(&cookie);
 
@@ -451,11 +451,11 @@ pub const Connection = struct {
         std.mem.writeInt(u32, header[12..16], 0, .big);
         std.mem.writeInt(u32, header[16..20], 0, .big);
 
-        header[20] = @intFromEnum(tag.Tag.uint32);
+        header[20] = @backingInt(tag.Tag.uint32);
 
-        std.mem.writeInt(u32, header[21..25], @intFromEnum(command), .big);
+        std.mem.writeInt(u32, header[21..25], @backingInt(command), .big);
 
-        header[25] = @intFromEnum(tag.Tag.uint32);
+        header[25] = @backingInt(tag.Tag.uint32);
 
         std.mem.writeInt(u32, header[26..30], serial, .big);
 
@@ -486,11 +486,11 @@ pub const Connection = struct {
                 continue;
             }
 
-            if (reply_command == @intFromEnum(Command.err)) {
+            if (reply_command == @backingInt(Command.err)) {
                 return Error.Refused;
             }
 
-            if (reply_command != @intFromEnum(Command.reply)) {
+            if (reply_command != @backingInt(Command.reply)) {
                 return Error.Protocol;
             }
 
@@ -642,10 +642,11 @@ fn load_cookie(buffer: *[cookie_bytes]u8) void {
 
     const home = sys.getenv(home_env) orelse return;
 
-    const path = std.fmt.bufPrintZ(
+    const path = std.mem.printSentinel(
         &storage,
         "{s}{s}",
         .{ home, cookie_suffix },
+        0,
     ) catch {
         return;
     };
@@ -690,7 +691,7 @@ fn resolve_socket(buffer: *[path_bytes_max]u8) ?[]const u8 {
 
     const runtime = sys.getenv(runtime_env) orelse return null;
 
-    const path = std.fmt.bufPrint(
+    const path = std.mem.print(
         buffer,
         "{s}{s}",
         .{ runtime, socket_suffix },
@@ -741,15 +742,15 @@ test "a fresh connection owns no socket" {
 }
 
 test "the command numbers match the native protocol" {
-    try testing.expectEqual(@as(u32, 8), @intFromEnum(Command.auth));
-    try testing.expectEqual(@as(u32, 9), @intFromEnum(Command.set_client_name));
-    try testing.expectEqual(@as(u32, 20), @intFromEnum(Command.get_server_info));
-    try testing.expectEqual(@as(u32, 22), @intFromEnum(Command.get_sink_info_list));
-    try testing.expectEqual(@as(u32, 24), @intFromEnum(Command.get_source_info_list));
-    try testing.expectEqual(@as(u32, 35), @intFromEnum(Command.subscribe));
-    try testing.expectEqual(@as(u32, 39), @intFromEnum(Command.set_sink_mute));
-    try testing.expectEqual(@as(u32, 40), @intFromEnum(Command.set_source_mute));
-    try testing.expectEqual(@as(u32, 44), @intFromEnum(Command.set_default_sink));
-    try testing.expectEqual(@as(u32, 45), @intFromEnum(Command.set_default_source));
-    try testing.expectEqual(@as(u32, 66), @intFromEnum(Command.subscribe_event));
+    try testing.expectEqual(@as(u32, 8), @backingInt(Command.auth));
+    try testing.expectEqual(@as(u32, 9), @backingInt(Command.set_client_name));
+    try testing.expectEqual(@as(u32, 20), @backingInt(Command.get_server_info));
+    try testing.expectEqual(@as(u32, 22), @backingInt(Command.get_sink_info_list));
+    try testing.expectEqual(@as(u32, 24), @backingInt(Command.get_source_info_list));
+    try testing.expectEqual(@as(u32, 35), @backingInt(Command.subscribe));
+    try testing.expectEqual(@as(u32, 39), @backingInt(Command.set_sink_mute));
+    try testing.expectEqual(@as(u32, 40), @backingInt(Command.set_source_mute));
+    try testing.expectEqual(@as(u32, 44), @backingInt(Command.set_default_sink));
+    try testing.expectEqual(@as(u32, 45), @backingInt(Command.set_default_source));
+    try testing.expectEqual(@as(u32, 66), @backingInt(Command.subscribe_event));
 }

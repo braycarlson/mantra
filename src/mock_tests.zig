@@ -18,8 +18,8 @@ test {
 }
 
 const Recorder = struct {
-    var directions: [8]?Direction = [_]?Direction{null} ** 8;
-    var events: [8]DeviceEvent = [_]DeviceEvent{.added} ** 8;
+    var directions: [8]?Direction = @splat(null);
+    var events: [8]DeviceEvent = @splat(.added);
     var count: u32 = 0;
 
     fn reset() void {

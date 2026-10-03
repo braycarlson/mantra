@@ -26,23 +26,23 @@ test:
 
 # Run the colocated unit tests and the tidy law, optionally filtered: just unit tidy
 unit filter="":
-    zig build test:unit --summary all -- {{filter}}
+    zig build test:unit --summary all {{ if filter == "" { "" } else { "-Dtest-filter=" + filter } }}
 
 # Run the full pipeline against the mock backend, optionally filtered
 mock filter="":
-    zig build test:mock --summary all -- {{filter}}
+    zig build test:mock --summary all {{ if filter == "" { "" } else { "-Dtest-filter=" + filter } }}
 
 # Run the PulseAudio tests against the session sound server, optionally filtered
 linux filter="":
-    zig build test:linux --summary all -- {{filter}}
+    zig build test:linux --summary all {{ if filter == "" { "" } else { "-Dtest-filter=" + filter } }}
 
 # Run the WASAPI tests on a Windows host, optionally filtered
 windows filter="":
-    zig build test:windows --summary all -- {{filter}}
+    zig build test:windows --summary all {{ if filter == "" { "" } else { "-Dtest-filter=" + filter } }}
 
 # Run the tidy check on its own
 tidy:
-    zig build test:unit -- tidy
+    zig build test:unit -Dtest-filter=tidy
 
 # Check that every source file is formatted
 fmt:
