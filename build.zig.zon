@@ -1,0 +1,13 @@
+.{
+    .name = .mantra,
+    .version = "0.1.0",
+    .minimum_zig_version = "0.17.0",
+    .fingerprint = 0x0e47e9dc0d755c29,
+    .paths = .{
+        "build.zig",
+        "build.zig.zon",
+        "LICENSE",
+        "src",
+    },
+    .dependencies = .{},
+}

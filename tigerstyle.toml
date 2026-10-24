@@ -1,0 +1,7 @@
+[extend-per-file-ignores]
+"src/platform/linux/events.zig" = ["TS005"]
+"src/platform/linux/runtime.zig" = ["TS005"]
+"src/platform/linux/tag.zig" = ["TS041"]
+"src/platform/mock/state.zig" = ["TS005"]
+"src/platform/windows/events.zig" = ["TS005"]
+"src/platform/windows/runtime.zig" = ["TS005"]
