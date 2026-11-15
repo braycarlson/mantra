@@ -1,0 +1,3 @@
+# mantra
+
+A library for audio endpoint control on Windows and Linux. The library enumerates capture and render devices, reads and writes their mute state and volume, moves the default device, and reports device changes as they happen. The Windows backend uses Core Audio, and the Linux backend speaks the PulseAudio protocol directly with no client library, so it also works against PipeWire. A `mantra.Mixer` runs on the backend of the target OS, and a `mantra.MixerType(mantra.Fake)` runs the same calls against an in-memory fake, so audio handling is tested with no hardware and no build option. A mixer is initialized in place and stays at one address until `deinit`, because the Linux event thread and the Windows notification client hold a pointer into it.

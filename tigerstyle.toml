@@ -1,0 +1,4 @@
+extend_select = ["TS022", "TS026"]
+
+[extend-per-file-ignores]
+"src/platform/linux/tag.zig" = ["TS041"]
